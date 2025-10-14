@@ -1,1 +1,1 @@
-# progObiek
+# Linear Equations Solver
