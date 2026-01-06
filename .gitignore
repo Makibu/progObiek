@@ -1,0 +1,19 @@
+# ===== Java build =====
+*.class
+out/
+target/
+
+# ===== Logs =====
+*.log
+
+# ===== IntelliJ IDEA =====
+.idea/
+*.iml
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Temporary files =====
+*.tmp
+*.swp
