@@ -1,4 +1,9 @@
-package solver.src;
+package api.util;
+
+import api.core.LinearSystem;
+import api.core.Matrix;
+import api.core.Result;
+import api.core.Vector;
 
 import java.io.*;
 import java.util.ArrayList;

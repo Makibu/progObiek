@@ -1,4 +1,4 @@
-package solver.src;
+package api.core;
 
 public class Vector extends Matrix {
 

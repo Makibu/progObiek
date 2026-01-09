@@ -1,4 +1,9 @@
-package solver.src;
+package api.core.solver;
+
+import api.core.LinearSystem;
+import api.core.Matrix;
+import api.core.Result;
+import api.core.Vector;
 
 public abstract class LinearSolver {
     protected int iterations;
