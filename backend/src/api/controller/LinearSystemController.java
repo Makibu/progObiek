@@ -55,21 +55,53 @@ public class LinearSystemController {
     public JSONObject resultToJson(Result result) {
         JSONObject json = new JSONObject();
 
+        // --- solution ---
         if (result.getSolution() != null) {
-            json.put("solution", result.getSolution().toArray());
+            double[] solArray = result.getSolution().toArray();
+
+            boolean invalid = false;
+            for (double v : solArray) {
+                if (Double.isNaN(v) || Double.isInfinite(v)) {
+                    invalid = true;
+                    break;
+                }
+            }
+
+            if (!invalid) {
+                json.put("solution", solArray);
+            } else {
+                json.put("solution", JSONObject.NULL);
+            }
         } else {
             json.put("solution", JSONObject.NULL);
         }
 
-        json.put("message", result.getMessage() != null ? result.getMessage() : "Matrix has no solution");
+        json.put("message", result.getMessage());
 
+        // --- residual ---
+        double residual = result.getResidual();
+        json.put("residual", Double.isFinite(residual) ? residual : 0.0);
+
+        // --- iterations ---
         json.put("iterations", result.getIterations());
-        json.put("computationTime", result.getComputationTime());
-        json.put("residual", result.getResidual());
 
-        if (result.getDeterminant() != 0) json.put("determinant", result.getDeterminant());
-        if (result.getRank() != 0) json.put("rank", result.getRank());
+        // --- computationTime ---
+        double time = result.getComputationTime();
+        json.put("computationTime", Double.isFinite(time) ? time : 0.0);
+
+        // --- determinant ---
+        double det = result.getDeterminant();
+        if (Double.isFinite(det) && det != 0) {
+            json.put("determinant", det);
+        }
+
+        // --- rank ---
+        int rank = result.getRank();
+        if (rank != 0) {
+            json.put("rank", rank);
+        }
 
         return json;
     }
+
 }
