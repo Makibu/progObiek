@@ -45,7 +45,7 @@ Aplikacja webowa do rozwiązywania układów równań liniowych przy użyciu ró
 - **Java JDK** (wersja 11+)
 - **npm** lub **yarn** (menedżer pakietów)
 
-## 🛠️ Instalacja i uruchomienie
+## Instalacja i uruchomienie
 
 ### 1. Backend (Serwer Java)
 ```bash
@@ -69,7 +69,7 @@ npm run dev
 ```
 Frontend będzie dostępny pod adresem `http://localhost:3000`
 
-## 📖 Jak używać
+## Jak używać
 
 ### Metoda 1: Ręczne wprowadzanie
 1. Wybierz solver z listy rozwijanej
