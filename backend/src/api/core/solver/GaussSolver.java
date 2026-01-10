@@ -9,31 +9,30 @@ public class GaussSolver extends LinearSolver {
     private boolean partialPivoting = true;
 
     public void setPartialPivoting(boolean partialPivoting) {
-        this.partialPivoting = partialPivoting;
+        this.partialPivoting = partialPivoting; // turn on/off pivoting
     }
 
     @Override
     public Result solve(LinearSystem system) {
         long startTime = System.nanoTime();
-        validateSystem(system);
+        validateSystem(system); // check if system is ok
 
         int n = system.getSize();
         Matrix A = system.getA().copy();
         Vector b = Vector.fromArray(system.getB().toArray());
 
-        // Forward elimination
+        // go row by row to make upper triangle
         for (int i = 0; i < n; i++) {
             if (partialPivoting) {
-                partialPivot(A, b, i);
+                partialPivot(A, b, i); // swap rows if needed
             }
 
-            // Check for zero pivot
             if (Math.abs(A.get(i, i)) < tolerance) {
                 computationTime = (System.nanoTime() - startTime) / 1000000;
                 return new Result(null, "Matrix is singular or nearly singular", 0, computationTime);
             }
 
-            // Eliminate below
+            // remove values below pivot
             for (int j = i + 1; j < n; j++) {
                 double factor = A.get(j, i) / A.get(i, i);
                 for (int k = i; k < n; k++) {
@@ -43,7 +42,7 @@ public class GaussSolver extends LinearSolver {
             }
         }
 
-        // Back substitution
+        // calculate solution from top
         Vector solution = new Vector(n);
         for (int i = n - 1; i >= 0; i--) {
             double sum = 0.0;
@@ -63,6 +62,7 @@ public class GaussSolver extends LinearSolver {
         int maxRow = row;
         double maxVal = Math.abs(A.get(row, row));
 
+        // find row with biggest pivot
         for (int i = row + 1; i < n; i++) {
             if (Math.abs(A.get(i, row)) > maxVal) {
                 maxVal = Math.abs(A.get(i, row));
@@ -71,13 +71,13 @@ public class GaussSolver extends LinearSolver {
         }
 
         if (maxRow != row) {
-            // Swap rows in A
+            // swap rows in matrix
             for (int j = 0; j < n; j++) {
                 double temp = A.get(row, j);
                 A.set(row, j, A.get(maxRow, j));
                 A.set(maxRow, j, temp);
             }
-            // Swap rows in b
+            // swap rows in vector
             double temp = b.get(row);
             b.set(row, b.get(maxRow));
             b.set(maxRow, temp);

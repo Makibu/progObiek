@@ -6,7 +6,6 @@ import api.core.Validator;
 import api.core.Vector;
 
 public class GaussSeidelSolver extends LinearSolver {
-
     @Override
     public Result solve(LinearSystem system) {
         long startTime = System.nanoTime();
@@ -17,7 +16,7 @@ public class GaussSeidelSolver extends LinearSolver {
 
         if (!Validator.isDiagonallyDominant(system.getA())) {
             long computationTime = (long) ((System.nanoTime() - startTime) / 1_000_000.0);
-            return new Result(null, "Matrix is not diagonally dominant – method may not converge", 0, computationTime);
+            return new Result(null, "Matrix may not converge", 0, computationTime);
         }
 
         iterations = 0;
@@ -29,7 +28,7 @@ public class GaussSeidelSolver extends LinearSolver {
                 double diag = system.getA().get(i, i);
                 if (Math.abs(diag) < tolerance) {
                     computationTime = (System.nanoTime() - startTime) / 1_000_000;
-                    return new Result(null, "Diagonal element zero – cannot solve", iterations, computationTime);
+                    return new Result(null, "Zero on diagonal", iterations, computationTime);
                 }
 
                 double sum = 0.0;
@@ -38,11 +37,11 @@ public class GaussSeidelSolver extends LinearSolver {
                 double xNew = (system.getB().get(i) - sum) / diag;
                 if (Double.isNaN(xNew) || Double.isInfinite(xNew)) {
                     computationTime = (System.nanoTime() - startTime) / 1_000_000;
-                    return new Result(null, "NaN or Infinity encountered", iterations, computationTime);
+                    return new Result(null, "NaN or Infinity found", iterations, computationTime);
                 }
 
                 error += Math.abs(xNew - x.get(i));
-                x.set(i, xNew);
+                x.set(i, xNew); // update immediately
             }
 
             iterations++;
@@ -55,9 +54,6 @@ public class GaussSeidelSolver extends LinearSolver {
         }
 
         computationTime = (System.nanoTime() - startTime) / 1_000_000;
-        return new Result(null, "Maximum iterations reached – did not converge", iterations, computationTime);
+        return new Result(null, "Max iterations reached", iterations, computationTime);
     }
-
-
-
 }
