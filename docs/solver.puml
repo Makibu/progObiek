@@ -1,0 +1,215 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide circle
+
+package "API REST" {
+  class Main {
+    +main(args: String[]): void
+  }
+
+  class LinearSystemController {
+    -gaussSolver: GaussSolver
+    -jacobiSolver: JacobiSolver
+    -gaussSeidelSolver: GaussSeidelSolver
+    --
+    +solveGauss(system: LinearSystem): Result
+    +solveJacobi(system: LinearSystem): Result
+    +solveGaussSeidel(system: LinearSystem): Result
+    +parseSystemFromJson(jsonString: String): LinearSystem
+    +resultToJson(result: Result): JSONObject
+  }
+}
+
+package "Core" {
+  class LinearSystem {
+    -A: Matrix
+    -b: Vector
+    --
+    +LinearSystem(A: Matrix, b: Vector)
+    +getA(): Matrix
+    +getB(): Vector
+    +getSize(): int
+    +setA(A: Matrix): void
+    +setB(b: Vector): void
+    +toString(): String
+  }
+
+  class Matrix {
+    -data: double[][]
+    -rows: int
+    -cols: int
+    --
+    +Matrix(rows: int, cols: int)
+    +Matrix(data: double[][])
+    +getRows(): int
+    +getCols(): int
+    +get(i: int, j: int): double
+    +set(i: int, j: int, value: double): void
+    +copy(): Matrix
+    +transpose(): Matrix
+    +multiply(other: Matrix): Matrix
+    +add(other: Matrix): Matrix
+    +{static} identity(size: int): Matrix
+    +{static} random(rows: int, cols: int): Matrix
+    +toString(): String
+    +toCompactString(): String
+  }
+
+  class Vector {
+    --
+    +Vector(size: int)
+    +Vector(data: double[])
+    +getSize(): int
+    +get(i: int): double
+    +set(i: int, value: double): void
+    +dotProduct(other: Vector): double
+    +norm(): double
+    +add(other: Vector): Vector
+    +subtract(other: Vector): Vector
+    +multiply(scalar: double): Vector
+    +toArray(): double[]
+    +{static} fromArray(data: double[]): Vector
+    +toString(): String
+  }
+
+  class Result {
+    -solution: Vector
+    -message: String
+    -iterations: int
+    -computationTime: long
+    -residual: double
+    -determinant: double
+    -rank: int
+    --
+    +Result(solution: Vector, message: String, iterations: int, computationTime: long)
+    +Result(solution: Vector, message: String, iterations: int, computationTime: long, residual: double)
+    +getSolution(): Vector
+    +getMessage(): String
+    +getIterations(): int
+    +getComputationTime(): long
+    +getResidual(): double
+    +getDeterminant(): double
+    +getRank(): int
+    +setDeterminant(determinant: double): void
+    +setRank(rank: int): void
+    +toString(): String
+  }
+}
+
+package "Solvers" {
+  abstract class LinearSolver {
+    #iterations: int
+    #computationTime: long
+    #maxIterations: int = 1000
+    #tolerance: double = 1e-10
+    --
+    +{abstract} solve(system: LinearSystem): Result
+    +getIterations(): int
+    +getComputationTime(): long
+    +setMaxIterations(maxIterations: int): void
+    +setTolerance(tolerance: double): void
+    #validateSystem(system: LinearSystem): void
+    #calculateResidual(system: LinearSystem, solution: Vector): double
+    -matrixToVector(matrix: Matrix): Vector
+  }
+
+  class GaussSolver {
+    -partialPivoting: boolean = true
+    --
+    +setPartialPivoting(partialPivoting: boolean): void
+    +solve(system: LinearSystem): Result
+    -partialPivot(A: Matrix, b: Vector, row: int): void
+  }
+
+  class JacobiSolver {
+    -consecutiveIncreases: int
+    -MAX_CONSECUTIVE_INCREASES: int = 10
+    --
+    +solve(system: LinearSystem): Result
+  }
+
+  class GaussSeidelSolver {
+    --
+    +solve(system: LinearSystem): Result
+  }
+}
+
+package "Utilities" {
+  class Validator {
+    --
+    +{static} validateSystem(system: LinearSystem): ValidationResult
+    +{static} isDiagonallyDominant(A: Matrix): boolean
+    +{static} calculateDeterminant(A: Matrix): double
+    +{static} calculateRank(A: Matrix): int
+  }
+
+  class ValidationResult {
+    -valid: boolean
+    -message: String
+    --
+    +ValidationResult(valid: boolean, message: String)
+    +isValid(): boolean
+    +getMessage(): String
+  }
+
+  class FileHandler {
+    --
+    +{static} readSystemFromFile(filename: String): LinearSystem
+    +{static} writeResultToFile(filename: String, result: Result, system: LinearSystem): void
+    +{static} writeMatrixToFile(filename: String, matrix: Matrix): void
+    -{static} matrixToVector(matrix: Matrix): Vector
+  }
+}
+
+' Relacje między klasami
+Main --> LinearSystemController : tworzy i używa
+LinearSystemController --> LinearSolver : używa
+LinearSystemController --> Validator : używa
+LinearSystemController --> FileHandler : używa
+
+LinearSystemController ..> LinearSystem : tworzy/parsuje
+LinearSystemController ..> Result : tworzy/przetwarza
+
+LinearSystem o-- Matrix : zawiera
+LinearSystem o-- Vector : zawiera
+
+Result o-- Vector : zawiera
+
+GaussSolver --|> LinearSolver
+JacobiSolver --|> LinearSolver
+GaussSeidelSolver --|> LinearSolver
+
+LinearSolver ..> LinearSystem : rozwiązuje
+LinearSolver ..> Result : zwraca
+LinearSolver ..> Validator : używa
+LinearSolver ..> Vector : używa
+LinearSolver ..> Matrix : używa
+
+Vector --|> Matrix : dziedziczy
+
+Validator ..> LinearSystem : waliduje
+Validator ..> Matrix : analizuje
+Validator ..> ValidationResult : zwraca
+
+FileHandler ..> LinearSystem : czyta/zapisuje
+FileHandler ..> Result : zapisuje
+FileHandler ..> Matrix : zapisuje
+
+' Dodatkowe uwagi
+note top of Main
+  Serwer HTTP na porcie 8080
+  Endpoint: POST /solve
+  Obsługa CORS
+end note
+
+note top of LinearSystemController
+  Parsowanie JSON, wybór solvera
+  Formatowanie odpowiedzi JSON
+end note
+
+note right of LinearSolver
+  Klasa abstrakcyjna
+  Wspólna konfiguracja
+  (tolerance, maxIterations)
+end note
+@enduml
