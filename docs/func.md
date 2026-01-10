@@ -1,66 +1,68 @@
 # LINEAR EQUATIONS SOLVER
 
-## FUNKCJONALNOŚCI
+## WYMAGANIA FUNKCJONALNE
 
 ### 1. Wczytywanie danych
 
-- Wczytywanie macierzy współczynników i wektora wyrazów wolnych z pliku
-- Możliwość ręcznego wprowadzania danych przez użytkownika
-- Walidacja poprawności danych (wymiary macierzy, brak wartości NaN)
+- Przyjmowanie danych poprzez interfejs przeglądarkowy
+- Automatyczne sprawdzanie wymiarów, wykrywanie wartości NaN
+- Odczyt układów równań z plików tekstowych
 
-### 2. Reprezentacja macierzy i wektora
+### 2. Reprezentacja danych
 
-- Klasa `Matrix` (przechowująca tablicę współczynników)
-- Klasa `Vector` (dla wektora prawej strony równań)
-- Metody pomocnicze: dodawanie, mnożenie, transpozycja, kopiowanie
+- Klasa `Matrix` - pełna implementacja operacji na macierzach:
+  - Tworzenie, kopiowanie, transpozycja
+  - Mnożenie, dodawanie macierzy
+- Klasa `Vector` - rozszerza klasę `Matrix`, specjalizacja dla wektorów:
+  - Iloczyn skalarny
+  - Dodawanie, odejmowanie, mnożenie przez skalar
+  - Konwersje do/z tablic
+- Reprezentacja układu równań liniowych Ax = b
 
-### 3. Implementacja algorytmów
+### 3. Algorytmy rozwiązywania
 
-- Metoda Gaussa
-- Metoda Jacobiego (iteracyjna)
-- Metoda Gaussa-Seidla (iteracyjna)
-- Klasa bazowa `LinearSolver` z metodą abstrakcyjną `solve(Matrix A, Vector b)` i klasy pochodne: `GaussSolver`, `JacobiSolver` i `GaussSeidelSolver`
+- Metoda Gaussa (`GaussSolver`):
+  - Eliminacja Gaussa z częściowym wyborem elementu głównego (pivoting)
+  - Obsługa macierzy osobliwych i prawie osobliwych
+  - Podstawienie wstecz
+- Metoda Jacobiego (`JacobiSolver`):
+  - Iteracyjna metoda dla macierzy diagonalnie dominujących
+  - Detekcja rozbieżności i dzielenia przez zero
+  - Kontrola maksymalnej liczby iteracji
+- Metoda Gaussa-Seidla (`GaussSeidelSolver`):
+  - Iteracyjna metoda z natychmiastowym wykorzystaniem nowych wartości
+  - Wymaganie diagonalnej dominacji dla gwarancji zbieżności
 
-### 4. Obsługa różnych przypadków
+### 4. Obsługa różnych przypadków układów
 
-- Układy oznaczone, nieoznaczone, sprzeczne
-- Macierze kwadratowe i prostokątne
-- Obsługa macierzy osobliwych
+- Układy kwadratowe - wymagane przez wszystkie zaimplementowane solvery
+- Automatyczne sprawdzanie zgodności A i b
+- Obsługa macierzy osobliwych - wykrywanie i odpowiednie komunikaty błędów
 
-### 5. Analiza układu
+### 5. Analiza i walidacja układu
 
-- Obliczanie wyznacznika macierzy
-- Sprawdzanie diagonalnej dominacji (dla metod iteracyjnych)
-- Wyznaczanie rzędu macierzy
+- Diagonalna dominacja - sprawdzanie warunku zbieżności metod iteracyjnych
+- Obliczanie residuum - norma |Ax - b| dla weryfikacji rozwiązania
 
-### 6. Konfiguracja rozwiązywania
+### 6. Konfiguracja solverów
 
-- Wybór metody rozwiązania przez użytkownika
-- Ustawienie parametrów (dokładność, maksymalna liczba iteracji)
-- Możliwość wyboru elementu głównego (pivoting) w metodzie Gaussa
+- Wybór metody (Gauss, Jacobi, Gauss-Seidel)
+- Parametry iteracyjne:
+  - Maksymalna liczba iteracji (domyślnie 1000)
+  - Tolerancja zbieżności (domyślnie 1e-10)
 
 ### 7. Prezentacja wyników
 
-- Wyświetlanie rozwiązania (wektor rozwiązań)
-- Informacja o liczbie wykonanych iteracji
-- Czas wykonania obliczeń
-- Informacja o zbieżności lub błędzie obliczeń
+- Wypisanie obliczonych rozwiązań
+- Informacje diagnostyczne:
+  - Status zbieżności/niezbieżności
+  - Liczba wykonanych iteracji
+  - Czas obliczeń w milisekundach
+  - Norma residuum dla oceny dokładności
 
-### 8. Zapisywanie wyników
+### 8. Interfejs użytkownika
 
-- Zapis wyników do pliku tekstowego
-- Eksport raportu z pełną analizą
-- Zapis macierzy do pliku w formacie czytelnym
-
-### 9. Interfejs użytkownika
-
-- Prosty interfejs graficzny z menu
-
-### 10. Testy i walidacja
-
-- Generowanie losowych układów do testów
-- Automatyczne testy poprawności rozwiązań
-- Porównanie efektywności różnych metod
+- Prosty interfejs przeglądarkowy
 
 ## STRUKTURA KLAS
 
